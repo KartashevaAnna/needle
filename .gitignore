@@ -1,0 +1,19 @@
+# Environments
+env*
+venv*
+.env
+.venv
+env/
+venv/
+venv
+ENV/
+env.bak/
+venv.bak/
+
+# JetBrains IDE
+.idea
+.idea/
+./idea/*
+
+tmp.py
+
