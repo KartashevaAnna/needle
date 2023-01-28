@@ -14,7 +14,6 @@ class KitAdmin(admin.ModelAdmin):
         "design_created_year",
     )
     search_fields = ("title", "author")
-    list_filter = ("created", "author")
 
 
 class ProjectAdmin(admin.ModelAdmin):
