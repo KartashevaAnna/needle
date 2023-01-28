@@ -13,6 +13,7 @@ class KitAdmin(admin.ModelAdmin):
         "creator",
         "total_crosses",
         "design_created_year",
+        "slug"
     )
     search_fields = ("title", "author", "company")
 

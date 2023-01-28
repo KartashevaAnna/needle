@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from pytils.translit import slugify
+from autoslug import AutoSlugField
 
 User = get_user_model()
 
@@ -57,16 +58,8 @@ class Kit(CreatedModel):
         null=True,
         blank=True,
     )
-    slug = models.SlugField(
-        max_length=250,
-        null=True,
-        blank=True,
-        unique=True,
-    )
+    slug = AutoSlugField(populate_from='title', slugify=slugify, null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created"]
