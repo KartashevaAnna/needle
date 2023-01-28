@@ -10,20 +10,29 @@
      Дата публикации: {{ kit.created|date:"d E Y" }}
     </li>
     <li>
-      Дизайн: {{ kit.title }}
+      Дизайн: «{{ kit.title }}»
     </li>
+    <li>
+      Слаг: «{{ kit.slug }}»
+    </li>
+      {% if kit.description %}
     <li>
       Описание: {{ kit.description }}
     </li>
+      {% endif %}
+      {% if kit.author %}
     <li>
       Дизайнер: {{ kit.author }}
     </li>
+      {% endif %}
     <li>
-      Кто завел на сайте: {{ kit.creator }}
+      Кто завел на сайте: {{ kit.creator.get_full_name }}
     </li>
+      {% if kit.design_created_year %}
     <li>
      Дата создания дизайна: {{ kit.design_created_year|date:"d E Y" }}
     </li>
+      {% endif %}
     <li>
      Всего крестиков: {{ kit.total_crosses }}
     </li>

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from pytils.translit import slugify
 
 User = get_user_model()
 
@@ -28,7 +29,18 @@ class Kit(CreatedModel):
     title = models.TextField("Название картины", help_text="Введите название картины")
     description = models.TextField(null=True, blank=True)
     author = models.CharField(
-        "Автор", help_text="Введите автора картины", max_length=100
+        "Автор",
+        help_text="Введите автора картины",
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    company = models.CharField(
+        "Производитель",
+        help_text="Введите название производителя",
+        max_length=100,
+        null=True,
+        blank=True,
     )
     creator = models.ForeignKey(
         User,
@@ -45,6 +57,16 @@ class Kit(CreatedModel):
         null=True,
         blank=True,
     )
+    slug = models.SlugField(
+        max_length=250,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created"]
@@ -61,12 +83,7 @@ class Project(CreatedModel):
     embroiderer = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Проект", related_name="project"
     )
-    slug = models.SlugField(
-        max_length=250,
-        null=True,
-        blank=True,
-        unique=True,
-    )
+    slug = models.ForeignKey(Kit, on_delete=models.CASCADE, verbose_name="Слаг проекта", related_name="project_slug")
 
     description = models.TextField(null=True, blank=True)
 

@@ -9,11 +9,12 @@ class KitAdmin(admin.ModelAdmin):
         "created",
         "description",
         "author",
+        "company",
         "creator",
         "total_crosses",
         "design_created_year",
     )
-    search_fields = ("title", "author")
+    search_fields = ("title", "author", "company")
 
 
 class ProjectAdmin(admin.ModelAdmin):
