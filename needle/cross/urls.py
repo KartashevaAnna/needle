@@ -3,5 +3,5 @@ from . import views
 
 urlpatterns = [
     # Главная страница
-    path('', views.index),
+    path("", views.index),
 ]
