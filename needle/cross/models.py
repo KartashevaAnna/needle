@@ -27,7 +27,9 @@ class CreatedUpdatedModel(CreatedModel):
 class Kit(CreatedModel):
     title = models.TextField("Название картины", help_text="Введите название картины")
     description = models.TextField(null=True, blank=True)
-    author = models.CharField("Автор", help_text="Введите автора картины", max_length=100)
+    author = models.CharField(
+        "Автор", help_text="Введите автора картины", max_length=100
+    )
     creator = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -65,6 +67,7 @@ class Project(CreatedModel):
         blank=True,
         unique=True,
     )
+
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -95,6 +98,3 @@ class Progress(CreatedUpdatedModel):
             "embroiderer",
             "kit",
         )
-
-
-# Create your models here.
