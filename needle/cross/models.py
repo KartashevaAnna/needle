@@ -5,7 +5,8 @@ from pytils.translit import slugify
 from deep_translator import GoogleTranslator
 
 User = get_user_model()
-translator = GoogleTranslator(source='auto', target='en')
+translator = GoogleTranslator(source="auto", target="en")
+
 
 class CreatedModel(models.Model):
     """Абстрактная модель. Добавляет дату создания."""
@@ -31,6 +32,13 @@ class Kit(CreatedModel):
     title = models.TextField(
         "Название картины", help_text="Введите название картины", unique=True
     )
+    title_translation = models.CharField(
+        "Перевод названия",
+        help_text="Введите перевод названия на английский или нажмите Enter",
+        max_length=100,
+        null=True,
+        blank=True,
+    )
     description = models.TextField(null=True, blank=True)
     author = models.CharField(
         "Автор",
@@ -53,7 +61,10 @@ class Kit(CreatedModel):
         related_name="kit_created",
     )
     total_crosses = models.PositiveIntegerField(
-        "размер картины", help_text="введите общее число крестиков в картине"
+        "размер картины",
+        help_text="введите общее число крестиков в картине",
+        null=True,
+        blank=True,
     )
     design_created_year = models.DateField(
         "Год создания дизайна",
@@ -61,14 +72,9 @@ class Kit(CreatedModel):
         null=True,
         blank=True,
     )
-    slug = AutoSlugField(populate_from="title_translation", slugify=slugify, null=True, blank=True)
 
-    title_translation = models.CharField(
-        "Перевод названия",
-        help_text="Введите перевод названия на английский или нажмите Enter",
-        max_length=100,
-        null=True,
-        blank=True,
+    slug = AutoSlugField(
+        populate_from="title_translation", slugify=slugify, null=True, blank=True
     )
 
     def get_translation(self):
@@ -77,6 +83,7 @@ class Kit(CreatedModel):
     def save(self, *args, **kwargs):
         if not self.title_translation:
             self.title_translation = self.get_translation()
+            self.title_translation = str(self.title_translation).replace(" ", "_")
         super(Kit, self).save(*args, **kwargs)
 
     class Meta:
