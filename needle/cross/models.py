@@ -1,10 +1,11 @@
-from django.db import models
-from django.contrib.auth import get_user_model
-from pytils.translit import slugify
 from autoslug import AutoSlugField
+from django.contrib.auth import get_user_model
+from django.db import models
+from pytils.translit import slugify
+from deep_translator import GoogleTranslator
 
 User = get_user_model()
-
+translator = GoogleTranslator(source='auto', target='en')
 
 class CreatedModel(models.Model):
     """Абстрактная модель. Добавляет дату создания."""
@@ -27,7 +28,9 @@ class CreatedUpdatedModel(CreatedModel):
 
 
 class Kit(CreatedModel):
-    title = models.TextField("Название картины", help_text="Введите название картины")
+    title = models.TextField(
+        "Название картины", help_text="Введите название картины", unique=True
+    )
     description = models.TextField(null=True, blank=True)
     author = models.CharField(
         "Автор",
@@ -58,8 +61,23 @@ class Kit(CreatedModel):
         null=True,
         blank=True,
     )
-    slug = AutoSlugField(populate_from='title', slugify=slugify, null=True, blank=True)
+    slug = AutoSlugField(populate_from="title_translation", slugify=slugify, null=True, blank=True)
 
+    title_translation = models.CharField(
+        "Перевод названия",
+        help_text="Введите перевод названия на английский или нажмите Enter",
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+
+    def get_translation(self):
+        return translator.translate(self.title)
+
+    def save(self, *args, **kwargs):
+        if not self.title_translation:
+            self.title_translation = self.get_translation()
+        super(Kit, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created"]
@@ -76,7 +94,12 @@ class Project(CreatedModel):
     embroiderer = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Проект", related_name="project"
     )
-    slug = models.ForeignKey(Kit, on_delete=models.CASCADE, verbose_name="Слаг проекта", related_name="project_slug")
+    slug = models.ForeignKey(
+        Kit,
+        on_delete=models.CASCADE,
+        verbose_name="Слаг проекта",
+        related_name="project_slug",
+    )
 
     description = models.TextField(null=True, blank=True)
 
