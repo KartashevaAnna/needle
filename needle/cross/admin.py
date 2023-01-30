@@ -1,6 +1,27 @@
 from django.contrib import admin
 
-from .models import Kit, Progress, Project
+from .models import Kit, Progress, Project, Designer, Company
+
+
+class DesignerAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "title_translation",
+        "slug",
+        "country",
+        "description",
+    )
+
+
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = (
+        "title",
+        "title_translation",
+        "slug",
+        "country",
+        "description",
+        "designer",
+    )
 
 
 class KitAdmin(admin.ModelAdmin):
@@ -8,7 +29,7 @@ class KitAdmin(admin.ModelAdmin):
         "title",
         "created",
         "description",
-        "author",
+        "designer",
         "company",
         "creator",
         "total_crosses",
@@ -16,7 +37,7 @@ class KitAdmin(admin.ModelAdmin):
         "slug",
         "title_translation",
     )
-    search_fields = ("title", "author", "company")
+    search_fields = ("title", "designer", "company")
 
 
 class ProjectAdmin(admin.ModelAdmin):
@@ -46,3 +67,5 @@ class ProgressAdmin(admin.ModelAdmin):
 admin.site.register(Kit, KitAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Progress, ProgressAdmin)
+admin.site.register(Designer, DesignerAdmin)
+admin.site.register(Company, CompanyAdmin)

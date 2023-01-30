@@ -1,4 +1,3 @@
-from autoslug import AutoSlugField
 from django.contrib.auth import get_user_model
 from django.db import models
 from pytils.translit import slugify
@@ -28,6 +27,86 @@ class CreatedUpdatedModel(CreatedModel):
     )
 
 
+class Designer(models.Model):
+    title = models.TextField(
+        "Имя дизайнера", help_text="Введите имя дизайнера", unique=True
+    )
+    title_translation = models.CharField(
+        "Перевод названия",
+        help_text="Введите перевод названия на английский или нажмите Enter",
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    slug = models.SlugField(null=True, blank=True)
+
+    country = models.TextField(
+        "Страна",
+        help_text="Введите страну производства",
+        null=True,
+        blank=True,
+    )
+    description = models.TextField(null=True, blank=True)
+
+    def get_translation(self):
+        return translator.translate(self.title)
+
+    def make_slug(self):
+        value = str(slugify(self.title_translation))
+        return value.lower().replace("-", "_")
+
+    def save(self, *args, **kwargs):
+        if not self.title_translation:
+            self.title_translation = self.get_translation()
+            self.slug = self.make_slug()
+        super(Designer, self).save(*args, **kwargs)
+
+
+class Company(models.Model):
+    title = models.TextField(
+        "Название компании", help_text="Введите название компании", unique=True
+    )
+    title_translation = models.CharField(
+        "Перевод названия",
+        help_text="Введите перевод названия на английский или нажмите Enter",
+        max_length=100,
+        null=True,
+        blank=True,
+    )
+    slug = models.SlugField(null=True, blank=True)
+
+    country = models.TextField(
+        "Страна",
+        help_text="Введите страну производства",
+        null=True,
+        blank=True,
+    )
+    description = models.TextField(null=True, blank=True)
+    designer = models.ForeignKey(
+        Designer,
+        on_delete=models.SET_NULL,
+        verbose_name="Дизайнер",
+        related_name="designer",
+        null=True,
+        blank=True,
+    )
+
+    slug = models.SlugField(null=True, blank=True)
+
+    def get_translation(self):
+        return translator.translate(self.title)
+
+    def make_slug(self):
+        value = str(slugify(self.title_translation))
+        return value.lower().replace("-", "_")
+
+    def save(self, *args, **kwargs):
+        if not self.title_translation:
+            self.title_translation = self.get_translation()
+            self.slug = self.make_slug()
+        super(Company, self).save(*args, **kwargs)
+
+
 class Kit(CreatedModel):
     title = models.TextField(
         "Название картины", help_text="Введите название картины", unique=True
@@ -40,13 +119,21 @@ class Kit(CreatedModel):
         blank=True,
     )
     description = models.TextField(null=True, blank=True)
-    author = models.CharField(
-        "Автор",
-        help_text="Введите автора картины",
-        max_length=100,
+    designer = models.ForeignKey(
+        Designer,
+        on_delete=models.CASCADE,
+        verbose_name="Дизайнер",
+        related_name="kit",
         null=True,
         blank=True,
     )
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        verbose_name="Дизайн",
+        related_name="kit"
+    )
+
     company = models.CharField(
         "Производитель",
         help_text="Введите название производителя",
@@ -92,7 +179,7 @@ class Kit(CreatedModel):
         ordering = ["-created"]
         unique_together = (
             "title",
-            "author",
+            "designer",
         )
 
 
@@ -101,16 +188,15 @@ class Project(CreatedModel):
         Kit, on_delete=models.CASCADE, verbose_name="Проект", related_name="project"
     )
     embroiderer = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Вышивальщица", related_name="project"
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Вышивальщица",
+        related_name="project",
     )
     slug = models.SlugField(null=True, blank=True)
 
     def make_slug(self):
-        value = (
-            str(slugify(self.embroiderer.get_full_name()))
-            + "_"
-            + self.kit.slug
-        )
+        value = str(slugify(self.embroiderer.get_full_name())) + "_" + self.kit.slug
         return value.lower().replace("-", "_")
 
     def save(self, *args, **kwargs):
