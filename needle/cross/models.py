@@ -15,37 +15,17 @@ class CreatedModel(models.Model):
         auto_now_add=True,
         db_index=True,
     )
-
-    class Meta:
-        abstract = True
-
-
-class CreatedUpdatedModel(CreatedModel):
-    modified = models.DateTimeField(
-        "Дата изменения",
-        auto_now=True,
-    )
-
-
-class Designer(models.Model):
     title = models.TextField(
-        "Имя дизайнера", help_text="Введите имя дизайнера", unique=True
+        "Имя", help_text="Введите имя", unique=True, default="My title"
     )
     title_translation = models.CharField(
-        "Перевод названия",
+        "Перевод",
         help_text="Введите перевод названия на английский или нажмите Enter",
         max_length=100,
         null=True,
         blank=True,
     )
     slug = models.SlugField(null=True, blank=True)
-
-    country = models.TextField(
-        "Страна",
-        help_text="Введите страну производства",
-        null=True,
-        blank=True,
-    )
     description = models.TextField(null=True, blank=True)
 
     def get_translation(self):
@@ -59,22 +39,29 @@ class Designer(models.Model):
         if not self.title_translation:
             self.title_translation = self.get_translation()
             self.slug = self.make_slug()
-        super(Designer, self).save(*args, **kwargs)
+        super(CreatedModel, self).save(*args, **kwargs)
+
+    class Meta:
+        abstract = True
 
 
-class Company(models.Model):
-    title = models.TextField(
-        "Название компании", help_text="Введите название компании", unique=True
+class CreatedUpdatedModel(CreatedModel):
+    modified = models.DateTimeField(
+        "Дата изменения",
+        auto_now=True,
     )
-    title_translation = models.CharField(
-        "Перевод названия",
-        help_text="Введите перевод названия на английский или нажмите Enter",
-        max_length=100,
+
+
+class Designer(CreatedModel):
+    country = models.TextField(
+        "Страна",
+        help_text="Введите страну производства",
         null=True,
         blank=True,
     )
-    slug = models.SlugField(null=True, blank=True)
 
+
+class Company(CreatedModel):
     country = models.TextField(
         "Страна",
         help_text="Введите страну производства",
@@ -91,34 +78,9 @@ class Company(models.Model):
         blank=True,
     )
 
-    slug = models.SlugField(null=True, blank=True)
-
-    def get_translation(self):
-        return translator.translate(self.title)
-
-    def make_slug(self):
-        value = str(slugify(self.title_translation))
-        return value.lower().replace("-", "_")
-
-    def save(self, *args, **kwargs):
-        if not self.title_translation:
-            self.title_translation = self.get_translation()
-            self.slug = self.make_slug()
-        super(Company, self).save(*args, **kwargs)
-
 
 class Kit(CreatedModel):
-    title = models.TextField(
-        "Название картины", help_text="Введите название картины", unique=True
-    )
-    title_translation = models.CharField(
-        "Перевод названия",
-        help_text="Введите перевод названия на английский или нажмите Enter",
-        max_length=100,
-        null=True,
-        blank=True,
-    )
-    description = models.TextField(null=True, blank=True)
+
     designer = models.ForeignKey(
         Designer,
         on_delete=models.CASCADE,
@@ -130,17 +92,12 @@ class Kit(CreatedModel):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        verbose_name="Дизайн",
-        related_name="kit"
-    )
-
-    company = models.CharField(
-        "Производитель",
-        help_text="Введите название производителя",
-        max_length=100,
+        verbose_name="Компания",
+        related_name="company",
         null=True,
         blank=True,
     )
+
     creator = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -159,21 +116,6 @@ class Kit(CreatedModel):
         null=True,
         blank=True,
     )
-
-    slug = models.SlugField(null=True, blank=True)
-
-    def get_translation(self):
-        return translator.translate(self.title)
-
-    def make_slug(self):
-        value = str(slugify(self.title_translation))
-        return value.lower().replace("-", "_")
-
-    def save(self, *args, **kwargs):
-        if not self.title_translation:
-            self.title_translation = self.get_translation()
-            self.slug = self.make_slug()
-        super(Kit, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created"]
