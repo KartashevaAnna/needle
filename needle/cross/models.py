@@ -73,17 +73,19 @@ class Kit(CreatedModel):
         blank=True,
     )
 
-    slug = AutoSlugField(
-        populate_from="title_translation", slugify=slugify, null=True, blank=True
-    )
+    slug = models.SlugField(null=True, blank=True)
 
     def get_translation(self):
         return translator.translate(self.title)
 
+    def make_slug(self):
+        value = str(slugify(self.title_translation))
+        return value.lower().replace("-", "_")
+
     def save(self, *args, **kwargs):
         if not self.title_translation:
             self.title_translation = self.get_translation()
-            self.title_translation = str(self.title_translation).replace(" ", "_")
+            self.slug = self.make_slug()
         super(Kit, self).save(*args, **kwargs)
 
     class Meta:
@@ -99,19 +101,24 @@ class Project(CreatedModel):
         Kit, on_delete=models.CASCADE, verbose_name="Проект", related_name="project"
     )
     embroiderer = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Проект", related_name="project"
+        User, on_delete=models.CASCADE, verbose_name="Вышивальщица", related_name="project"
     )
-    slug = models.ForeignKey(
-        Kit,
-        on_delete=models.CASCADE,
-        verbose_name="Слаг проекта",
-        related_name="project_slug",
-    )
+    slug = models.SlugField(null=True, blank=True)
+
+    def make_slug(self):
+        value = (
+            str(slugify(self.embroiderer.get_full_name()))
+            + "_"
+            + self.kit.slug
+        )
+        return value.lower().replace("-", "_")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self.make_slug()
+        super(Project, self).save(*args, **kwargs)
 
     description = models.TextField(null=True, blank=True)
-
-    def __str__(self):
-        return self.title
 
 
 class Progress(CreatedUpdatedModel):
