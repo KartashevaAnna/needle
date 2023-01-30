@@ -1,12 +1,12 @@
-def index(request):
-    template = "cross/index.html"
-    return render(request, template)
-
-
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
 from .models import Kit
+
+
+def index(request):
+    template = "cross/index.html"
+    return render(request, template)
 
 
 def get_pagination(request, post_list):

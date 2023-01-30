@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Kit, Project, Progress
+from .models import Kit, Progress, Project
 
 
 class KitAdmin(admin.ModelAdmin):
@@ -13,7 +13,8 @@ class KitAdmin(admin.ModelAdmin):
         "creator",
         "total_crosses",
         "design_created_year",
-        "slug"
+        "slug",
+        "title_translation"
     )
     search_fields = ("title", "author", "company")
 

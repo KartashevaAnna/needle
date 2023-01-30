@@ -5,36 +5,35 @@
     {% for kit in page_obj %}
 <article>
   <span>
+    <h1>«{{ kit.title }}» / {{ kit.title_translation }} </h1>
+
   <ul>
-     <li>
-     Дата публикации: {{ kit.created|date:"d E Y" }}
-    </li>
-    <li>
-      Дизайн: «{{ kit.title }}»
-    </li>
     <li>
       Слаг: «{{ kit.slug }}»
     </li>
       {% if kit.description %}
-    <li>
-      Описание: {{ kit.description }}
-    </li>
+        <li>
+          Описание: {{ kit.description }}
+        </li>
       {% endif %}
       {% if kit.author %}
-    <li>
-      Дизайнер: {{ kit.author }}
-    </li>
+        <li>
+          Дизайнер: {{ kit.author }}
+        </li>
       {% endif %}
-    <li>
-      Кто завел на сайте: {{ kit.creator.get_full_name }}
-    </li>
       {% if kit.design_created_year %}
-    <li>
-     Дата создания дизайна: {{ kit.design_created_year|date:"d E Y" }}
-    </li>
+        <li>
+         Дата создания дизайна: {{ kit.design_created_year|date:"d E Y" }}
+        </li>
       {% endif %}
     <li>
      Всего крестиков: {{ kit.total_crosses }}
+    </li>
+    <li>
+     Дата публикации: {{ kit.created|date:"d E Y" }}
+    </li>
+    <li>
+      Кто завел на сайте: {{ kit.creator.get_full_name }}
     </li>
   </ul>
   </span>
