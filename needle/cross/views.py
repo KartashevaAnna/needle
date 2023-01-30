@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
-from .models import Kit
+from .models import *
 
 
 def index(request):
