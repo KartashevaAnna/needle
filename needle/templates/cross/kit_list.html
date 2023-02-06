@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Все наборы{% endblock %}
+{% block content %}
+<h1> Список наборов </h1>
+    {% for kit in page_obj %}
+<article>
+  <ul>
+    <li>
+      Название набора: «{{ kit.title }}»
+              <a class="custom_link" href="{% url 'cross:kit_detail' kit.slug %}">Подробнее</a>
+    </li>
+  </ul>
+  </span>
+</article>
+    {% endfor %}
+{% include 'includes/paginator.html' %}
+{% endblock %}

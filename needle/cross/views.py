@@ -1,12 +1,7 @@
 from django.core.paginator import Paginator
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import *
-
-
-def index(request):
-    template = "cross/index.html"
-    return render(request, template)
 
 
 def get_pagination(request, post_list):
@@ -23,3 +18,20 @@ def index(request):
         "page_obj": page_obj,
     }
     return render(request, "cross/index.html", context)
+
+
+def kit_detail(request, slug):
+    kit = get_object_or_404(Kit, slug=slug)
+    context = {
+        "kit": kit,
+    }
+    return render(request, "cross/kit_detail.html", context)
+
+def kit_list(request):
+    kit = Kit.objects.all()
+    page_obj = get_pagination(request, kit)
+    context = {
+        "kit": kit,
+        "page_obj": page_obj,
+    }
+    return render(request, "cross/kit_list.html", context)
