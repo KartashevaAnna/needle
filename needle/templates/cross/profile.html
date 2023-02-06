@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Личная страница пользователя{% endblock %}
+{% block content %}
+<h1> {{ user.get_full_name }} </h1>
+<li>
+ {% for progress in page_obj %}
+    {{ progress.kit.title }}
+    <p>{{ progress.modified }}</p>
+    <p>Вышито крестиков за день: {{ progress.crosses_done }}</p>
+    <p>Всего крестиков {{ progress.kit.total_crosses }}</p>
+    <p>Осталось крестиков {{  }}</p>
+
+  {% endfor %}
+</li>
+
+{% include 'includes/paginator.html' %}
+{% endblock %}

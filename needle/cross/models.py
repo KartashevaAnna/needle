@@ -154,12 +154,12 @@ class Progress(CreatedUpdatedModel):
         User,
         on_delete=models.CASCADE,
         related_name="progress",
-        verbose_name="Прогресс",
+        verbose_name="пользователь",
     )
     kit = models.ForeignKey(
         Kit,
         on_delete=models.CASCADE,
-        verbose_name="Прогресс",
+        verbose_name="дизайн",
         related_name="progress",
     )
     crosses_done = models.PositiveIntegerField(

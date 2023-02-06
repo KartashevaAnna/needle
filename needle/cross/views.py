@@ -27,6 +27,7 @@ def kit_detail(request, slug):
     }
     return render(request, "cross/kit_detail.html", context)
 
+
 def kit_list(request):
     kit = Kit.objects.all()
     page_obj = get_pagination(request, kit)
@@ -35,3 +36,15 @@ def kit_list(request):
         "page_obj": page_obj,
     }
     return render(request, "cross/kit_list.html", context)
+
+
+def profile(request, username):
+    embroiderer = get_object_or_404(User, username=username)
+    my_progress = Progress.objects.select_related("embroiderer")
+    page_obj = get_pagination(request, my_progress)
+
+    context = {
+        "embroiderer": embroiderer,
+        "page_obj": page_obj,
+    }
+    return render(request, "cross/profile.html", context)
