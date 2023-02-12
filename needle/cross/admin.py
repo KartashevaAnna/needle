@@ -41,6 +41,9 @@ class KitAdmin(admin.ModelAdmin):
 
 
 class ProjectAdmin(admin.ModelAdmin):
+    def title(self, obj):
+        return [kit.name for kit in obj.kit.all()]
+
     list_display = (
         "kit",
         "embroiderer",
@@ -53,15 +56,39 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 class ProgressAdmin(admin.ModelAdmin):
-    list_display = (
-        "embroiderer",
-        "kit",
-        "crosses_done",
-        "created",
-        "modified",
-    )
+    # fields = (
+    #     "embroiderer",
+    #     "kit",
+    #     "crosses_done",
+    #     "created",
+    #     "modified",
+    # )
+    # list_display = (
+    #     "embroiderer",
+    #     "kit",
+    #     "crosses_done",
+    #     "created",
+    #     "modified",
+    # )
     search_fields = ("kit", "embroiderer")
     list_filter = ("kit", "embroiderer")
+
+    def title(self, obj):
+        return [kit.name for kit in obj.kit.all()]
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "embroiderer",
+                    "kit",
+                    "title",
+                    "crosses_done",
+                )
+            },
+        ),
+    )
 
 
 admin.site.register(Kit, KitAdmin)

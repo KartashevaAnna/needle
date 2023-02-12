@@ -15,9 +15,7 @@ class CreatedModel(models.Model):
         auto_now_add=True,
         db_index=True,
     )
-    title = models.TextField(
-        "Имя", help_text="Введите имя", unique=True, default="My title"
-    )
+    title = models.TextField("Имя", help_text="Введите имя", unique=True)
     title_translation = models.CharField(
         "Перевод",
         help_text="Введите перевод названия на английский или нажмите Enter",
@@ -30,6 +28,9 @@ class CreatedModel(models.Model):
 
     def get_translation(self):
         return translator.translate(self.title)
+
+    def __str__(self):
+        return self.title
 
     def make_slug(self):
         value = str(slugify(self.title_translation))
@@ -165,11 +166,10 @@ class Progress(CreatedUpdatedModel):
     crosses_done = models.PositiveIntegerField(
         "Вышито крестиков", help_text="Введите количество вышитых крестиков"
     )
+    day = models.DateField(auto_now=True, editable=True)
+    # title = Kit.objects.select_related().filter(kit=kit)
 
     class Meta:
         ordering = ["-modified"]
         verbose_name = ("прогресс",)
-        unique_together = (
-            "embroiderer",
-            "kit",
-        )
+        unique_together = ("embroiderer", "kit", "day")
