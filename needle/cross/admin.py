@@ -5,8 +5,8 @@ from .models import Kit, Progress, Project, Designer, Company
 
 class DesignerAdmin(admin.ModelAdmin):
     list_display = (
-        "title",
-        "title_translation",
+        "name",
+        "name_translation",
         "slug",
         "country",
         "description",
@@ -15,18 +15,17 @@ class DesignerAdmin(admin.ModelAdmin):
 
 class CompanyAdmin(admin.ModelAdmin):
     list_display = (
-        "title",
-        "title_translation",
+        "name",
+        "name_translation",
         "slug",
         "country",
         "description",
-        "designer",
     )
 
 
 class KitAdmin(admin.ModelAdmin):
     list_display = (
-        "title",
+        "name",
         "created",
         "description",
         "designer",
@@ -34,14 +33,16 @@ class KitAdmin(admin.ModelAdmin):
         "creator",
         "total_crosses",
         "design_created_year",
+        "design_created",
         "slug",
-        "title_translation",
+        "name_translation",
     )
-    search_fields = ("title", "designer", "company")
+    list_editable = ("total_crosses", "design_created")
+    search_fields = ("name", "designer", "company")
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    def title(self, obj):
+    def name(self, obj):
         return [kit.name for kit in obj.kit.all()]
 
     list_display = (
@@ -50,49 +51,61 @@ class ProjectAdmin(admin.ModelAdmin):
         "slug",
         "description",
         "created",
+        "name",
+        "get_total_crosses",
+        # "project"
     )
     search_fields = ("kit", "embroiderer")
     list_filter = ("kit", "embroiderer")
 
 
+#
+#
 class ProgressAdmin(admin.ModelAdmin):
-    # fields = (
-    #     "embroiderer",
-    #     "kit",
-    #     "crosses_done",
-    #     "created",
-    #     "modified",
-    # )
-    # list_display = (
-    #     "embroiderer",
-    #     "kit",
-    #     "crosses_done",
-    #     "created",
-    #     "modified",
-    # )
-    search_fields = ("kit", "embroiderer")
-    list_filter = ("kit", "embroiderer")
-
-    def title(self, obj):
-        return [kit.name for kit in obj.kit.all()]
-
-    fieldsets = (
-        (
-            None,
-            {
-                "fields": (
-                    "embroiderer",
-                    "kit",
-                    "title",
-                    "crosses_done",
-                )
-            },
-        ),
+    fields = (
+        "embroiderer",
+        "project",
+        "done",
+        "remains",
+        "name",
     )
+    list_display = (
+        "embroiderer",
+        "project",
+        "done",
+        "remains",
+        "name",
+        "created",
+        "pk",
+    )
+    list_editable = (
+        "done",
+        "project",
+    )
+    search_fields = ("project", "embroiderer")
+    list_filter = ("project", "embroiderer")
+
+    # def name(self, obj):
+    #     return [kit.name for kit in obj.kit.all()]
 
 
+#
+#     fieldsets = (
+#         (
+#             None,
+#             {
+#                 "fields": (
+#                     "embroiderer",
+#                     "kit",
+#                     "name",
+#                     "crosses_done",
+#                 )
+#             },
+#         ),
+#     )
+
+admin.site.register(Designer, DesignerAdmin)
+admin.site.register(Company, CompanyAdmin)
 admin.site.register(Kit, KitAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Progress, ProgressAdmin)
-admin.site.register(Designer, DesignerAdmin)
-admin.site.register(Company, CompanyAdmin)

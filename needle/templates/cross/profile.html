@@ -8,10 +8,7 @@
     <p>{{ progress.modified }}</p>
     <p>Вышито крестиков за день: {{ progress.crosses_done }}</p>
     <p>Всего крестиков {{ progress.kit.total_crosses }}</p>
-    <p>Осталось крестиков </p>
-
-  {% endfor %}
-</li>
-
+    <p> Всего крестиков второй метод {{ my_total_crosses }}</p>
+ {% endfor %}
 {% include 'includes/paginator.html' %}
 {% endblock %}

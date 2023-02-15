@@ -1,7 +1,11 @@
+import datetime
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from pytils.translit import slugify
 from deep_translator import GoogleTranslator
+from datetime import datetime
 
 User = get_user_model()
 translator = GoogleTranslator(source="auto", target="en")
@@ -15,9 +19,9 @@ class CreatedModel(models.Model):
         auto_now_add=True,
         db_index=True,
     )
-    title = models.TextField("Имя", help_text="Введите имя", unique=True)
-    title_translation = models.CharField(
-        "Перевод",
+    name = models.TextField("name", help_text="Введите имя", null=True, blank=True)
+    name_translation = models.CharField(
+        "name_translation",
         help_text="Введите перевод названия на английский или нажмите Enter",
         max_length=100,
         null=True,
@@ -27,18 +31,18 @@ class CreatedModel(models.Model):
     description = models.TextField(null=True, blank=True)
 
     def get_translation(self):
-        return translator.translate(self.title)
+        return translator.translate(self.name)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     def make_slug(self):
-        value = str(slugify(self.title_translation))
+        value = str(slugify(self.name_translation))
         return value.lower().replace("-", "_")
 
     def save(self, *args, **kwargs):
-        if not self.title_translation:
-            self.title_translation = self.get_translation()
+        if not self.name_translation:
+            self.name_translation = self.get_translation()
             self.slug = self.make_slug()
         super(CreatedModel, self).save(*args, **kwargs)
 
@@ -48,14 +52,16 @@ class CreatedModel(models.Model):
 
 class CreatedUpdatedModel(CreatedModel):
     modified = models.DateTimeField(
-        "Дата изменения",
+        "modified",
         auto_now=True,
     )
 
 
 class Designer(CreatedModel):
+    name = models.TextField("name", help_text="Введите имя", unique=True)
+
     country = models.TextField(
-        "Страна",
+        "country",
         help_text="Введите страну производства",
         null=True,
         blank=True,
@@ -63,29 +69,26 @@ class Designer(CreatedModel):
 
 
 class Company(CreatedModel):
+    name = models.TextField("name", help_text="Введите имя", unique=True)
     country = models.TextField(
-        "Страна",
+        "country",
         help_text="Введите страну производства",
         null=True,
         blank=True,
     )
     description = models.TextField(null=True, blank=True)
-    designer = models.ForeignKey(
-        Designer,
-        on_delete=models.SET_NULL,
-        verbose_name="Дизайнер",
-        related_name="designer",
-        null=True,
-        blank=True,
-    )
 
 
 class Kit(CreatedModel):
-
+    name = models.TextField(
+        "name",
+        help_text="Введите имя",
+        unique=True,
+    )
     designer = models.ForeignKey(
         Designer,
         on_delete=models.CASCADE,
-        verbose_name="Дизайнер",
+        verbose_name="designer",
         related_name="kit",
         null=True,
         blank=True,
@@ -93,8 +96,8 @@ class Kit(CreatedModel):
     company = models.ForeignKey(
         Company,
         on_delete=models.CASCADE,
-        verbose_name="Компания",
-        related_name="company",
+        verbose_name="company",
+        related_name="kit",
         null=True,
         blank=True,
     )
@@ -102,38 +105,44 @@ class Kit(CreatedModel):
     creator = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="Создала набор на сайте",
-        related_name="kit_created",
+        verbose_name="kit_created_by",
+        related_name="kit_created_by",
     )
     total_crosses = models.PositiveIntegerField(
-        "размер картины",
+        "total_crosses",
         help_text="введите общее число крестиков в картине",
         null=True,
         blank=True,
     )
-    design_created_year = models.DateField(
+    design_created = models.DateField(
         "Год создания дизайна",
         help_text="Введите год, в котором был разработан дизайн",
         null=True,
         blank=True,
     )
 
+    def design_created_year(self):
+        try:
+            return self.design_created.strftime("%Y")
+        except Exception as e:
+            return None
+
     class Meta:
         ordering = ["-created"]
         unique_together = (
-            "title",
+            "name",
             "designer",
         )
 
 
 class Project(CreatedModel):
     kit = models.ForeignKey(
-        Kit, on_delete=models.CASCADE, verbose_name="Проект", related_name="project"
+        Kit, on_delete=models.CASCADE, verbose_name="kit", related_name="project"
     )
     embroiderer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="Вышивальщица",
+        verbose_name="embroiderer",
         related_name="project",
     )
     slug = models.SlugField(null=True, blank=True)
@@ -142,34 +151,65 @@ class Project(CreatedModel):
         value = str(slugify(self.embroiderer.get_full_name())) + "_" + self.kit.slug
         return value.lower().replace("-", "_")
 
+    def get_total_crosses(self):
+        total_crosses = self.kit.total_crosses
+        return total_crosses
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = self.make_slug()
+        if not self.name:
+            self.name = self.slug
         super(Project, self).save(*args, **kwargs)
 
     description = models.TextField(null=True, blank=True)
 
 
-class Progress(CreatedUpdatedModel):
+class Progress(CreatedModel):
     embroiderer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="progress",
         verbose_name="пользователь",
     )
-    kit = models.ForeignKey(
-        Kit,
+    project = models.ForeignKey(
+        Project,
         on_delete=models.CASCADE,
-        verbose_name="дизайн",
+        verbose_name="project",
         related_name="progress",
     )
-    crosses_done = models.PositiveIntegerField(
-        "Вышито крестиков", help_text="Введите количество вышитых крестиков"
+
+    done = models.PositiveIntegerField(
+        "done",
+        help_text="Введите количество вышитых крестиков",
     )
-    day = models.DateField(auto_now=True, editable=True)
-    # title = Kit.objects.select_related().filter(kit=kit)
+    created = models.DateTimeField(
+        "created",
+        auto_now=True,
+    )
+    modified = models.DateTimeField(
+        "modified",
+        auto_now=True,
+    )
+    remains = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
+
+    def get_remaining_crosses(self):
+        self.remains = self.project.kit.total_crosses - self.done
+        return self.remains
+
+    def get_name(self):
+        name = str(self.project.name)
+        return name
+
+    def save(self, *args, **kwargs):
+        self.remains = self.get_remaining_crosses()
+        if not self.name:
+            self.name = self.get_name()
+        super(Progress, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-modified"]
-        verbose_name = ("прогресс",)
-        unique_together = ("embroiderer", "kit", "day")
+        unique_together = ("embroiderer", "project", "modified")

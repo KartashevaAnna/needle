@@ -13,8 +13,8 @@ def get_pagination(request, post_list):
 
 
 def index(request):
-    kit_list = Kit.objects.all()
-    page_obj = get_pagination(request, kit_list)
+    kits = Kit.objects.all()
+    page_obj = get_pagination(request, kits)
     context = {
         "page_obj": page_obj,
     }
@@ -40,14 +40,18 @@ def kit_list(request):
 
 
 def profile(request, username):
-    embroiderer = get_object_or_404(User, username=username)
-    my_progress = Progress.objects.select_related("embroiderer")
-    df = pd.DataFrame(my_progress)
-    df.to_csv(f"progress{username}", index=False)
-    page_obj = get_pagination(request, my_progress)
-
+    p = list(Progress.objects.select_related())
+    p = p[0].kit.total_crosses
+    # progress = Progress.objects.select_related("embroiderer")
+    # my_kit = Kit.objects.select_related("progress")
+    # kit = Progress.objects.filter(id=1).select_related()
+    # total = kit.total_crosses
+    # print(f'kit is {kit}, total crosses: {total}')
+    print(
+        "################################################################################################"
+    )
+    print(p)
     context = {
-        "embroiderer": embroiderer,
-        "page_obj": page_obj,
+        "progress": p,
     }
     return render(request, "cross/profile.html", context)
