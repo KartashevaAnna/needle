@@ -1,10 +1,7 @@
-import datetime
-from django.db.models import F
+from deep_translator import GoogleTranslator
 from django.contrib.auth import get_user_model
 from django.db import models
 from pytils.translit import slugify
-from deep_translator import GoogleTranslator
-from datetime import datetime
 
 User = get_user_model()
 translator = GoogleTranslator(source="auto", target="en")

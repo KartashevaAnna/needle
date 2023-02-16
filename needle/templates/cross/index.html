@@ -3,8 +3,10 @@
 {% block content %}
 <h1> Стартовая</h1>
 <p><a href="{% url 'admin:index' %}">Админка</a></p>
-<p><a class="custom_link" href="{% url 'cross:kit_list' %}">Список наборов</a></p>
+<p><a href="{% url 'cross:kit_create' %}">Создать набор</a></p>
+<p><a class="custom_link" href="{% url 'cross:kit_list' %}">Все наборы</a></p>
 <p><a href="{% url 'cross:profile' user.username %}">Профиль</a></p>
+
 
 {% include 'includes/paginator.html' %}
 {% endblock %}

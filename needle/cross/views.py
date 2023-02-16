@@ -2,6 +2,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .models import *
+from .forms import *
 import pandas as pd
 
 
@@ -19,6 +20,34 @@ def index(request):
         "page_obj": page_obj,
     }
     return render(request, "cross/index.html", context)
+
+
+def kit_create(request):
+    form = KitForm(request.POST or None)
+    if form.is_valid():
+        kit = form.save(commit=False)
+        kit.creator = request.user
+        kit.save()
+        return redirect("cross:kit_list")
+    return render(request, "cross/create_kit.html", {"form": form})
+
+
+def kit_edit(request, kit_id):
+    kit = get_object_or_404(Kit, id=kit_id)
+    form = KitForm(request.POST or None, instance=kit)
+    if request.user != kit.creator:
+        return redirect("cross:kit_detail", kit_id)
+    if form.is_valid():
+        form.save()
+        return redirect("cross:kit_detail", kit_id)
+    return render(
+        request,
+        "posts/create_post.html",
+        {
+            "form": form,
+            "kit_id": kit_id,
+        },
+    )
 
 
 def kit_detail(request, slug):
@@ -40,18 +69,12 @@ def kit_list(request):
 
 
 def profile(request, username):
-    p = list(Progress.objects.select_related())
-    p = p[0].kit.total_crosses
-    # progress = Progress.objects.select_related("embroiderer")
-    # my_kit = Kit.objects.select_related("progress")
-    # kit = Progress.objects.filter(id=1).select_related()
-    # total = kit.total_crosses
-    # print(f'kit is {kit}, total crosses: {total}')
-    print(
-        "################################################################################################"
-    )
-    print(p)
+    embroiderer = get_object_or_404(User, username=username)
+    project_list = embroiderer.project.select_related("embroiderer")
+    page_obj = get_pagination(request, project_list)
+
     context = {
-        "progress": p,
+        "embroiderer": embroiderer,
+        "page_obj": page_obj,
     }
     return render(request, "cross/profile.html", context)

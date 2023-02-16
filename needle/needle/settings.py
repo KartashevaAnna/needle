@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "needle",
     "cross",
+    "sorl.thumbnail",
 ]
 
 MIDDLEWARE = [

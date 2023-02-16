@@ -3,12 +3,12 @@
 {% block content %}
 <h1> {{ user.get_full_name }} </h1>
 <li>
- {% for progress in page_obj %}
-    {{ progress.kit.title }}
+ {% for project in page_obj %}
+
+    {{ project.name }}
     <p>{{ progress.modified }}</p>
-    <p>Вышито крестиков за день: {{ progress.crosses_done }}</p>
-    <p>Всего крестиков {{ progress.kit.total_crosses }}</p>
-    <p> Всего крестиков второй метод {{ my_total_crosses }}</p>
+    <p>Вышито крестиков за день: {{ project.progress.done }}</p>
+    <p>Всего крестиков {{ project.kit.size }}</p>
  {% endfor %}
 {% include 'includes/paginator.html' %}
 {% endblock %}
