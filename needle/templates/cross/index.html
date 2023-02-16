@@ -5,7 +5,9 @@
 <p><a href="{% url 'admin:index' %}">Админка</a></p>
 <p><a href="{% url 'cross:kit_create' %}">Создать набор</a></p>
 <p><a class="custom_link" href="{% url 'cross:kit_list' %}">Все наборы</a></p>
+{% if user.username %}
 <p><a href="{% url 'cross:profile' user.username %}">Профиль</a></p>
+{% endif %}
 
 
 {% include 'includes/paginator.html' %}

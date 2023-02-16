@@ -15,13 +15,16 @@ class CreatedModel(models.Model):
         auto_now_add=True,
         db_index=True,
     )
-    name = models.TextField("name", help_text="Введите имя", null=True, blank=True)
+    name = models.CharField(
+        "name", help_text="Введите имя", max_length=100, null=True, blank=True
+    )
     name_translation = models.CharField(
         "name_translation",
-        help_text="Введите перевод названия на английский или нажмите Enter",
+        help_text="Введите перевод названия на английский или оставьте пустым",
         max_length=100,
         null=True,
         blank=True,
+        unique=True,
     )
     slug = models.SlugField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -54,21 +57,33 @@ class CreatedUpdatedModel(CreatedModel):
 
 
 class Designer(CreatedModel):
-    name = models.TextField("name", help_text="Введите имя", unique=True)
+    name = models.CharField(
+        "name",
+        help_text="Введите имя",
+        max_length=100,
+        unique=True,
+    )
 
-    country = models.TextField(
+    country = models.CharField(
         "country",
         help_text="Введите страну производства",
+        max_length=100,
         null=True,
         blank=True,
     )
 
 
 class Company(CreatedModel):
-    name = models.TextField("name", help_text="Введите имя", unique=True)
-    country = models.TextField(
+    name = models.CharField(
+        "name",
+        help_text="Введите имя",
+        max_length=100,
+        unique=True,
+    )
+    country = models.CharField(
         "country",
         help_text="Введите страну производства",
+        max_length=100,
         null=True,
         blank=True,
     )
@@ -76,9 +91,10 @@ class Company(CreatedModel):
 
 
 class Kit(CreatedModel):
-    name = models.TextField(
+    name = models.CharField(
         "name",
         help_text="Введите имя",
+        max_length=100,
         unique=True,
     )
     designer = models.ForeignKey(
@@ -206,7 +222,10 @@ class Progress(CreatedModel):
     )
 
     def get_remaining_crosses(self):
-        self.remains = self.project.kit.size - self.done
+        try:
+            self.remains = self.project.kit.size - self.done
+        except TypeError:
+            return None
 
     def get_name(self):
         name = str(self.project.name)

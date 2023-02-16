@@ -44,7 +44,7 @@ class KitAdmin(admin.ModelAdmin):
         "design_created",
         "name_translation",
     )
-    list_display_links = ('name',)
+    list_display_links = ("name",)
     search_fields = ("name", "designer", "company")
 
 

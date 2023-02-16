@@ -22,6 +22,12 @@ class KitForm(forms.ModelForm):
             "length",
             "height",
         )
+        labels = {
+            "design_created": "Год создания дизайна",
+        }
+        help_texts = {
+            "design_created": "Введите год в формате 2023-02-03 (год-месяц-день)",
+        }
 
     def clean_name_translation(self):
         cleaned_data = super().clean()
