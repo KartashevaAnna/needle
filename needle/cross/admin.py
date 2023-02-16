@@ -31,13 +31,13 @@ class KitAdmin(admin.ModelAdmin):
         "designer",
         "company",
         "creator",
-        "total_crosses",
+        "size",
         "design_created_year",
         "design_created",
         "slug",
         "name_translation",
     )
-    list_editable = ("total_crosses", "design_created")
+    list_editable = ("size", "design_created")
     search_fields = ("name", "designer", "company")
 
 
@@ -52,7 +52,7 @@ class ProjectAdmin(admin.ModelAdmin):
         "description",
         "created",
         "name",
-        "get_total_crosses",
+        "size",
         # "project"
     )
     search_fields = ("kit", "embroiderer")

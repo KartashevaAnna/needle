@@ -1,6 +1,5 @@
 import datetime
-import datetime
-
+from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.db import models
 from pytils.translit import slugify
@@ -108,8 +107,8 @@ class Kit(CreatedModel):
         verbose_name="kit_created_by",
         related_name="kit_created_by",
     )
-    total_crosses = models.PositiveIntegerField(
-        "total_crosses",
+    size = models.PositiveIntegerField(
+        "size",
         help_text="введите общее число крестиков в картине",
         null=True,
         blank=True,
@@ -120,12 +119,22 @@ class Kit(CreatedModel):
         null=True,
         blank=True,
     )
+    length = models.PositiveIntegerField(null=True, blank=True)
+    height = models.PositiveIntegerField(null=True, blank=True)
 
     def design_created_year(self):
         try:
             return self.design_created.strftime("%Y")
         except Exception as e:
             return None
+
+    def save(self, *args, **kwargs):
+        if not self.name_translation:
+            self.name_translation = self.get_translation()
+            self.slug = self.make_slug()
+        if not self.size:
+            self.size = int(self.length) * int(self.height)
+        super(Kit, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ["-created"]
@@ -151,9 +160,9 @@ class Project(CreatedModel):
         value = str(slugify(self.embroiderer.get_full_name())) + "_" + self.kit.slug
         return value.lower().replace("-", "_")
 
-    def get_total_crosses(self):
-        total_crosses = self.kit.total_crosses
-        return total_crosses
+    def size(self):
+        size = self.kit.size
+        return size
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -197,7 +206,7 @@ class Progress(CreatedModel):
     )
 
     def get_remaining_crosses(self):
-        self.remains = self.project.kit.total_crosses - self.done
+        self.remains = self.project.kit.size - self.done
         return self.remains
 
     def get_name(self):
