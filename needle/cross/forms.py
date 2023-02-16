@@ -35,34 +35,3 @@ class KitForm(forms.ModelForm):
                 "придумайте уникальное значение"
             )
         return name_translation
-
-
-#
-# class ProjectForm(forms.ModelForm):
-#     class Meta:
-#         model = Project
-#         fields = ("kit", "embroiderer", "slug", "description")
-#         labels = {
-#             "kit": "дизайн",
-#             "embroiderer": "вышивальщица",
-#             "slug": "слаг",
-#             "description": "описание",
-#         }
-#
-#
-# class ProgressForm(forms.ModelForm):
-#     class Meta:
-#         model = Progress
-#         fields = (
-#             "embroiderer",
-#             "kit",
-#             "done",
-#         )
-#         labels = {
-#             "embroiderer": "вышивальщица",
-#             "kit": "набор",
-#             "done": "Вышито крестиков",
-#         }
-#         help_texts = {
-#             "text-help": "Введите количество вышитых крестиков",
-#         }

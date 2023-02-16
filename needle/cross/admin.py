@@ -37,7 +37,14 @@ class KitAdmin(admin.ModelAdmin):
         "slug",
         "name_translation",
     )
-    list_editable = ("size", "design_created")
+    list_editable = (
+        "designer",
+        "company",
+        "size",
+        "design_created",
+        "name_translation",
+    )
+    list_display_links = ('name',)
     search_fields = ("name", "designer", "company")
 
 
@@ -53,7 +60,6 @@ class ProjectAdmin(admin.ModelAdmin):
         "created",
         "name",
         "size",
-        # "project"
     )
     search_fields = ("kit", "embroiderer")
     list_filter = ("kit", "embroiderer")
@@ -85,24 +91,6 @@ class ProgressAdmin(admin.ModelAdmin):
     search_fields = ("project", "embroiderer")
     list_filter = ("project", "embroiderer")
 
-    # def name(self, obj):
-    #     return [kit.name for kit in obj.kit.all()]
-
-
-#
-#     fieldsets = (
-#         (
-#             None,
-#             {
-#                 "fields": (
-#                     "embroiderer",
-#                     "kit",
-#                     "name",
-#                     "crosses_done",
-#                 )
-#             },
-#         ),
-#     )
 
 admin.site.register(Designer, DesignerAdmin)
 admin.site.register(Company, CompanyAdmin)

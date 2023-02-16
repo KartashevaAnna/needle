@@ -122,7 +122,7 @@ class Kit(CreatedModel):
     def design_created_year(self):
         try:
             return self.design_created.strftime("%Y")
-        except Exception as e:
+        except AttributeError:
             return None
 
     def save(self, *args, **kwargs):
@@ -130,7 +130,10 @@ class Kit(CreatedModel):
             self.name_translation = self.get_translation()
             self.slug = self.make_slug()
         if not self.size:
-            self.size = int(self.length) * int(self.height)
+            try:
+                self.size = int(self.length) * int(self.height)
+            except TypeError:
+                pass
         super(Kit, self).save(*args, **kwargs)
 
     class Meta:
@@ -204,14 +207,13 @@ class Progress(CreatedModel):
 
     def get_remaining_crosses(self):
         self.remains = self.project.kit.size - self.done
-        return self.remains
 
     def get_name(self):
         name = str(self.project.name)
         return name
 
     def save(self, *args, **kwargs):
-        self.remains = self.get_remaining_crosses()
+        self.get_remaining_crosses()
         if not self.name:
             self.name = self.get_name()
         super(Progress, self).save(*args, **kwargs)
